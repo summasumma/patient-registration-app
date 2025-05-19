@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { Toaster } from "react-hot-toast";
 import PatientRegistrationForm from "./components/PatientRegistrationForm";
 import QueryExecutor from "./components/QueryExecutor";
 import { db } from "./utils/pgliteConfig";
@@ -7,6 +8,7 @@ const channel = new BroadcastChannel("patient_data_channel");
 
 function App() {
   const [dataChanged, setDataChanged] = useState(0);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     async function initializeDatabase() {
@@ -18,11 +20,14 @@ function App() {
             age INTEGER NOT NULL,
             gender TEXT NOT NULL,
             contact_info TEXT,
-            address TEXT
+            address TEXT,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
           );
         `);
       } catch (error) {
         console.error("Database initialization failed:", error);
+      } finally {
+        setIsLoading(false);
       }
     }
     initializeDatabase();
@@ -30,7 +35,6 @@ function App() {
 
   useEffect(() => {
     const handleMessage = (e) => {
-      console.log("BroadcastChannel message received:", e.data); // Debug log
       if (e.data.type === "data_updated") {
         setDataChanged((prev) => prev + 1);
       }
@@ -40,15 +44,29 @@ function App() {
   }, []);
 
   const handleDataChange = () => {
-    console.log("Data change triggered"); // Debug log
     setDataChanged((prev) => prev + 1);
   };
 
+  if (isLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
+      </div>
+    );
+  }
+
   return (
-    <div className="container mx-auto p-4">
-      <h1 className="text-3xl font-bold mb-8">Patient Registration App</h1>
-      <PatientRegistrationForm onDataChange={handleDataChange} />
-      <QueryExecutor key={dataChanged} />
+    <div className="min-h-screen bg-gray-50">
+      <Toaster position="top-right" />
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <h1 className="text-4xl font-bold text-gray-900 mb-8">
+          Patient Registration App
+        </h1>
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+          <PatientRegistrationForm onDataChange={handleDataChange} />
+          <QueryExecutor key={dataChanged} />
+        </div>
+      </div>
     </div>
   );
 }
