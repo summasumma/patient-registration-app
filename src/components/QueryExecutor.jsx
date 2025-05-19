@@ -4,7 +4,7 @@ import PatientTable from "./PatientTable";
 import { db } from "../utils/pgliteConfig";
 
 function QueryExecutor() {
-  const [query, setQuery] = useState("SELECT * FROM patients ORDER BY created_at DESC");
+  const [query, setQuery] = useState("SELECT * FROM patients;");
   const [results, setResults] = useState([]);
   const [error, setError] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
