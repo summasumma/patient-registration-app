@@ -21,7 +21,7 @@ function App() {
             gender TEXT NOT NULL,
             contact_info TEXT,
             address TEXT,
-            created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
           );
         `);
       } catch (error) {
